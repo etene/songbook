@@ -1,0 +1,15 @@
+name: Generate songbook PDF
+
+on:
+  push:
+    branches: [ "master", "ci" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+
+    runs-on: ctornau/latex
+    steps:
+      - name: generate
+        run: make
