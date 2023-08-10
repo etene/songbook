@@ -89,7 +89,7 @@ class Chord(NamedTuple):
             }[match.group(0)]
         return (
             "\\newcommand{\\print"
-            + re.sub("\d+", replace_numbers, str(self).replace("#", "sharp"))
+            + re.sub(r"\d+", replace_numbers, str(self).replace("#", "sharp"))
             + "}{\\gtab{"
             + str(self).replace("#", r"\#")
             + "}{"
