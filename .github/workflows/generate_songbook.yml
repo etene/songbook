@@ -21,7 +21,9 @@ jobs:
           sudo apt update
           sudo apt install make texlive-music texlive-lang-french texlive-latex-extra tree
       - name: Generate songbook
-        run: make
+        run: |
+          latex --version
+          make
       - name: Create static files for github pages
         run: |
           mkdir -p _site
