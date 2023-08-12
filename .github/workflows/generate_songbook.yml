@@ -19,7 +19,7 @@ jobs:
       - name: Install build dependencies
         run: |
           sudo apt update
-          sudo apt install make texlive-music texlive-lang-french texlive-latex-extra tree
+          sudo apt install make texlive-music texlive-lang-french texlive-latex-extra qrencode
       - name: Generate songbook
         run: |
           latex --version
@@ -28,7 +28,9 @@ jobs:
         run: |
           mkdir -p _site
           cp -v build/songbook.pdf _site/
-          cd _site/ && tree -H . > index.html
+          cp -v index.html _site/
+          qrencode https://etene.github.io/songbook/songbook.pdf -o _site/qrcode.png
+
       - name: Deploy pages artifact
         uses: actions/upload-pages-artifact@v2
 
