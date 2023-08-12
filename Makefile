@@ -7,16 +7,17 @@ build:
 	mkdir -vp build
 
 build/songs: songs/*.tex build
-	ln -vfs ../songs build/songs
+	ln -vfs ../songs $@
 
 build/songlist.tex: build/songs scripts/makesonglist.py
-	python3 scripts/makesonglist.py songs > build/songlist.tex
+	python3 scripts/makesonglist.py songs > $@
 
-build/songbook.tex: build template.tex
-	cp -v template.tex build/songbook.tex
+build/songbook.tex: build template.tex newline-fix.tex scripts/apply_newline_fix.sh
+	cp -v template.tex $@
+	scripts/apply_newline_fix.sh $@
 
 build/chords.tex: build scripts/chords.py chords/*.ini
-	python3 scripts/chords.py chords/ukulele.ini > build/chords.tex
+	python3 scripts/chords.py chords/ukulele.ini > $@
 
 build/songbook.pdf: build/songlist.tex build/songbook.tex build/chords.tex
 	cd build && pdflatex songbook.tex

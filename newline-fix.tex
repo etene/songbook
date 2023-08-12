@@ -1,0 +1,9 @@
+% https://tex.stackexchange.com/questions/650106/recent-update-broke-songs-package
+
+\makeatletter
+\renewcommand\SB@obeylines{%
+	\let\obeyedline\SB@par%
+	\obeylines%
+	\let\@par\SB@@par%
+}
+\makeatother
