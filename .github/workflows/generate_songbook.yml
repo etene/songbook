@@ -26,9 +26,8 @@ jobs:
           make
       - name: Create static files for github pages
         run: |
-          mkdir -p _site
+          cp -rv site _site
           cp -v build/songbook.pdf _site/
-          cp -v index.html _site/
           qrencode https://etene.github.io/songbook/songbook.pdf -o _site/qrcode.png
 
       - name: Deploy pages artifact
