@@ -10,7 +10,11 @@ build/songs: songs/*.tex
 build/songlist.tex: build/songs songbook_tools/*.py
 	python3.12 -m songbook_tools makesonglist songs > $@
 
-build/songbook.tex: build/chords.tex build/songlist.tex template.tex newline-fix.tex scripts/apply_newline_fix.sh
+build/buildinfo.tex: songbook_tools/*.py
+	mkdir -vp build
+	python3.12 -m songbook_tools makebuildinfo > $@
+
+build/songbook.tex: build/chords.tex build/songlist.tex build/buildinfo.tex template.tex newline-fix.tex scripts/apply_newline_fix.sh
 	cp -v template.tex $@
 	scripts/apply_newline_fix.sh $@
 

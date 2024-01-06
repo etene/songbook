@@ -2,6 +2,7 @@ import argparse
 from io import TextIOWrapper
 from operator import attrgetter
 from pathlib import Path
+import subprocess
 from . import chords
 import re
 
@@ -29,6 +30,12 @@ def make_chords(instrument_file: TextIOWrapper):
     all_chords = chords.parse_chord_data(instrument_file)
     for chord, finger_positions in all_chords.items():
         print(chord.to_latex(finger_positions))
+
+
+def make_buildinfo():
+    """Print a Latex command with the current date and repo state."""
+    git_hash = subprocess.check_output(["git", "describe", "--always", "--dirty", "--abbrev"]).strip().decode()
+    print("\\date{compilé le \\today{} -- commit \\texttt{" + git_hash + "}}")
 
 
 def insert_chords(song: TextIOWrapper, chords_per_line: int):
@@ -63,6 +70,9 @@ def get_parser() -> argparse.ArgumentParser:
     insertchords_psr.add_argument("song", type=argparse.FileType("r"))
     insertchords_psr.add_argument("-n", "--chords-per-line", default=5, type=int)
     insertchords_psr.set_defaults(action=insert_chords)
+
+    makebuildinfo_psr = spsrs.add_parser("makebuildinfo")
+    makebuildinfo_psr.set_defaults(action=make_buildinfo)
     return psr
 
 

@@ -10,15 +10,15 @@ footskip=.25in]{geometry}
 
 \noversenumbers
 
-% add generated chord file
+% add generated files
 \input{chords.tex}
-
+\input{buildinfo.tex}
 \newindex{sons}{songsindex}
 
 \makeindex
-
+\title{Carnet de chants}
 \begin{document}
-
+\maketitle
 \showindex[2]{Index}{sons}
 
 \songcolumns{2}
