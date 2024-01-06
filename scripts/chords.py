@@ -80,6 +80,18 @@ class Chord(NamedTuple):
         return f"{self.root}{type_}{add}"
 
     def to_latex(self, finger_positions: list[int]) -> str:
+        return (
+            "\\newcommand{"
+            + self.latex_command
+            + "}{\\gtab{"
+            + str(self).replace("#", r"\#")
+            + "}{"
+            + ''.join(map(str, finger_positions))
+            + "}}"
+        )
+
+    @property
+    def latex_command(self) -> str:
         def replace_numbers(match: re.Match) -> str:
             return {
                 "7": "seven",
@@ -87,15 +99,7 @@ class Chord(NamedTuple):
                 "11": "eleven",
                 "13": "thirteen",
             }[match.group(0)]
-        return (
-            "\\newcommand{\\print"
-            + re.sub(r"\d+", replace_numbers, str(self).replace("#", "sharp"))
-            + "}{\\gtab{"
-            + str(self).replace("#", r"\#")
-            + "}{"
-            + ''.join(map(str, finger_positions))
-            + "}}"
-        )
+        return "\\print" + re.sub(r"\d+", replace_numbers, str(self).replace("#", "sharp"))
 
 
 def parse_chord_data(data: io.TextIOWrapper) -> dict[Chord, list[int]]:

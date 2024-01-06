@@ -12,10 +12,10 @@ jobs:
     steps:
       - name: Check out git repo
         uses: actions/checkout@v3
-      - name: Install Python 3.11
+      - name: Install Python 3.12
         uses: actions/setup-python@v4
         with:
-          python-version: 3.11
+          python-version: 3.12
       - name: Install build dependencies
         run: |
           sudo apt update

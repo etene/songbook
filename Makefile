@@ -3,23 +3,24 @@ all: build/songbook.pdf
 view: all
 	xdg-open build/songbook.pdf
 
-build:
-	mkdir -vp build
 
-build/songs: songs/*.tex build
-	ln -vfs ../songs $@
+
+build/songs: songs/*.tex
+	mkdir -vp build/songs
+	sh -exc 'for i in $^; do python3.12 -m scripts.insertchords $$i > build/$$i; done'
 
 build/songlist.tex: build/songs scripts/makesonglist.py
-	python3 scripts/makesonglist.py songs > $@
+	python3.12 scripts/makesonglist.py songs > $@
 
-build/songbook.tex: build template.tex newline-fix.tex scripts/apply_newline_fix.sh
+build/songbook.tex: build/chords.tex build/songlist.tex template.tex newline-fix.tex scripts/apply_newline_fix.sh
 	cp -v template.tex $@
 	scripts/apply_newline_fix.sh $@
 
-build/chords.tex: build scripts/chords.py chords/*.ini
-	python3 scripts/chords.py chords/ukulele.ini > $@
+build/chords.tex: scripts/chords.py chords/*.ini
+	mkdir -vp build
+	python3.12 scripts/chords.py chords/ukulele.ini > $@
 
-build/songbook.pdf: build/songlist.tex build/songbook.tex build/chords.tex
+build/songbook.pdf: build/songbook.tex
 	cd build && pdflatex songbook.tex
 	texlua scripts/songidx.lua build/songsindex.sxd build/songsindex.sbx
 	cd build && pdflatex songbook.tex
