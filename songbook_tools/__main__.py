@@ -1,0 +1,76 @@
+import argparse
+from io import TextIOWrapper
+from operator import attrgetter
+from pathlib import Path
+from . import chords
+import re
+
+
+def insert_after_pattern(song: str, text: str, pattern: re.Pattern) -> str:
+    """Insert `text` after the first occurence of `pattern` in `song`."""
+    match = pattern.search(song)
+    return "\n".join((
+        song[:match.end()],
+        text,
+        song[match.end():],
+    ))
+
+
+def make_song_list(songdir: Path):
+    """Print a Latex `\\input` command for each song in the given `songdir`."""
+    assert songdir.is_dir()
+    for i in sorted(songdir.iterdir(), key=attrgetter("name")):
+        if i.suffix == ".tex":
+            print(f"\\input{{{i}}}")
+
+
+def make_chords(instrument_file: TextIOWrapper):
+    """Print a Latex command that shows finger positions for each chord in `instrument_file`."""
+    all_chords = chords.parse_chord_data(instrument_file)
+    for chord, finger_positions in all_chords.items():
+        print(chord.to_latex(finger_positions))
+
+
+def insert_chords(song: TextIOWrapper, chords_per_line: int):
+    """Detect chords in a song and insert commands to print their finger positions under the title."""
+    song_tex = song.read()
+    found_chords = chords.find_chords(song_tex)
+    print(
+        insert_after_pattern(
+            song_tex,
+            text=chords.generate_latex_chords(
+                chords=found_chords,
+                chords_per_line=chords_per_line,
+            ),
+            pattern=re.compile(r"\\beginsong.*+\n", re.M),
+        )
+    )
+
+
+def get_parser() -> argparse.ArgumentParser:
+    """Create the argument parser for the songbook tools."""
+    psr = argparse.ArgumentParser("songbook_tools")
+    spsrs = psr.add_subparsers(required=True)
+    songlist_psr = spsrs.add_parser("makesonglist")
+    songlist_psr.set_defaults(action=make_song_list)
+    songlist_psr.add_argument("songdir", type=Path)
+
+    makechords_psr = spsrs.add_parser("makechords")
+    makechords_psr.set_defaults(action=make_chords)
+    makechords_psr.add_argument("instrument_file", type=argparse.FileType("r"))
+
+    insertchords_psr = spsrs.add_parser("insertchords")
+    insertchords_psr.add_argument("song", type=argparse.FileType("r"))
+    insertchords_psr.add_argument("-n", "--chords-per-line", default=5, type=int)
+    insertchords_psr.set_defaults(action=insert_chords)
+    return psr
+
+
+def main():
+    args_dict = get_parser().parse_args().__dict__
+    func = args_dict.pop("action")
+    func(**args_dict)
+
+
+if __name__ == "__main__":
+    main()
