@@ -7,7 +7,7 @@ from enum import StrEnum, auto
 from typing import NamedTuple
 
 
-CHORD_RE = re.compile(r"\\\[([\w\d]+)\]")
+CHORD_RE = re.compile(r"\\\[([\w\d#]+)\]")
 
 
 class NoteName(StrEnum):
