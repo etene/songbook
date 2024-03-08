@@ -6,6 +6,8 @@ This way, I only have to put songs in the right directory, commit & push them an
 
 Using this to generate your own songbook should just be a matter of copying the repo, replacing the songs with your own and customizing the CI config.
 
-
 ## Automatic finger patterns
 
+Ukulele finger patterns are automatically inserted at the beginning of each song.
+
+Song files are scanned for chords and finger positions for the matching chords in `chords/ukulele.ini` are added after the title.

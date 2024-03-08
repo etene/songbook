@@ -1,13 +1,19 @@
+SONGS_BUILD_DIR=build/songs
+SONGS=$(wildcard songs/*.tex)
+BUILT_SONGS=$(patsubst songs/%.tex,$(SONGS_BUILD_DIR)/%.tex,$(SONGS))
+
 all: build/songbook.pdf
 
 view: build/songbook.pdf
 	xdg-open $^
 
-build/songs/*.tex: songs/*.tex
-	mkdir -vp build/songs
-	sh -exc 'for i in $^; do python3.12 -m songbook_tools insertchords $$i > build/$$i; done'
+$(SONGS_BUILD_DIR):
+	mkdir -vp $(SONGS_BUILD_DIR)
 
-build/songlist.tex: build/songs/*.tex songbook_tools/*.py
+$(BUILT_SONGS): $(SONGS_BUILD_DIR)/%.tex: songs/%.tex | $(SONGS_BUILD_DIR)
+	python3.12 -m songbook_tools insertchords $< > $@
+
+build/songlist.tex: $(BUILT_SONGS) songbook_tools/*.py
 	python3.12 -m songbook_tools makesonglist songs > $@
 
 build/buildinfo.tex: songbook_tools/*.py
@@ -22,7 +28,7 @@ build/chords.tex: songbook_tools/*.py chords/*.ini
 	mkdir -vp build
 	python3.12 -m songbook_tools makechords chords/ukulele.ini > $@
 
-build/songbook.pdf: build/chords.tex build/songlist.tex build/buildinfo.tex build/songs/*.tex build/songbook.tex
+build/songbook.pdf: build/chords.tex build/songlist.tex build/buildinfo.tex $(BUILT_SONGS) build/songbook.tex
 	cd build && pdflatex songbook.tex
 	texlua scripts/songidx.lua build/songsindex.sxd build/songsindex.sbx
 	cd build && pdflatex songbook.tex
