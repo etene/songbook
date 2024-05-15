@@ -55,7 +55,7 @@ CHORD_PATTERN: re.Pattern = re.compile(
 
 class Chord(NamedTuple):
     root: NoteName
-    type: NoteType = NoteType.major
+    type: NoteType | None = None
     add: int | None = None
 
     @classmethod
@@ -63,17 +63,15 @@ class Chord(NamedTuple):
         """Parse from a short chord name like F or D7 or Am7."""
         if match := CHORD_PATTERN.match(shortname):
             raw_note = match["root_note"]
-            raw_note_type = match["short_type"]
-            raw_add = match["add"]
             return cls(
                 root=NoteName(note_aliases.get(raw_note, raw_note)),
-                type=NoteType[raw_note_type] if raw_note_type else NoteType.major,
-                add=int(raw_add) if raw_add else None
+                type=NoteType[raw_note_type] if (raw_note_type := match["short_type"]) else None,
+                add=int(raw_add) if (raw_add := match["add"]) else None
             )
         raise ValueError(f"Cannot parse note {shortname!r}")
 
     def __str__(self) -> str:
-        if self.type is NoteType.major:
+        if self.type is None or (self.type is NoteType.major and self.add is None):
             type_ = ""
         elif self.type is NoteType.minor:
             type_ = "m"
@@ -108,9 +106,11 @@ class Chord(NamedTuple):
 
 
 def parse_chord_data(data: io.TextIOWrapper) -> dict[Chord, list[int]]:
-    """Parse chords from a .ini file.
+    """Parse fingers positions for chords from a .ini file.
 
-    The file must have a section for each "white" note and an entry for each chord.
+    Return a mapping of chords to finger positions.
+    
+    The file must have a section for each note and an entry for each chord.
     """
     parser = ConfigParser()
     parser.optionxform = str  # makes it case sensitive
@@ -128,7 +128,7 @@ def parse_chord_data(data: io.TextIOWrapper) -> dict[Chord, list[int]]:
 
 
 def find_chords(tex: str) -> list[Chord]:
-    """Find chords mentioned in a song."""
+    """Find unique chords mentioned in a song, in the order in which they appear."""
     found = []
     for chord_match in CHORD_RE.finditer(tex):
         if (chord := Chord.parse(chord_match[1])) not in found:
@@ -138,10 +138,10 @@ def find_chords(tex: str) -> list[Chord]:
 
 def generate_latex_chords(chords: list[Chord], chords_per_line: int = 5) -> str:
     """Generate comands to print finger positions for the given chord list."""
-    lines = []
+    lines: list[str] = []
     for chord_batch in itertools.batched(chords, n=chords_per_line):
-        for chord in chord_batch:
-            lines.append(chord.latex_command)
+        lines.extend(i.latex_command for i in chord_batch)
         lines.append("\\newline")
+    # Remove last newline
     lines.pop()
     return "\n".join(lines)

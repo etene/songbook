@@ -10,6 +10,7 @@ import re
 def insert_after_pattern(song: str, text: str, pattern: re.Pattern) -> str:
     """Insert `text` after the first occurence of `pattern` in `song`."""
     match = pattern.search(song)
+    assert match
     return "\n".join((
         song[:match.end()],
         text,
@@ -58,20 +59,20 @@ def get_parser() -> argparse.ArgumentParser:
     """Create the argument parser for the songbook tools."""
     psr = argparse.ArgumentParser("songbook_tools")
     spsrs = psr.add_subparsers(required=True)
-    songlist_psr = spsrs.add_parser("makesonglist")
+    songlist_psr = spsrs.add_parser("makesonglist", help=make_song_list.__doc__)
     songlist_psr.set_defaults(action=make_song_list)
-    songlist_psr.add_argument("songdir", type=Path)
+    songlist_psr.add_argument("songdir", type=Path, help="Where the .tex files are located")
 
-    makechords_psr = spsrs.add_parser("makechords")
+    makechords_psr = spsrs.add_parser("makechords", help=make_chords.__doc__)
     makechords_psr.set_defaults(action=make_chords)
-    makechords_psr.add_argument("instrument_file", type=argparse.FileType("r"))
+    makechords_psr.add_argument("instrument_file", type=argparse.FileType("r"), help="An ini file with chords & finger positions")
 
-    insertchords_psr = spsrs.add_parser("insertchords")
-    insertchords_psr.add_argument("song", type=argparse.FileType("r"))
-    insertchords_psr.add_argument("-n", "--chords-per-line", default=6, type=int)
+    insertchords_psr = spsrs.add_parser("insertchords", help=insert_chords.__doc__)
+    insertchords_psr.add_argument("song", type=argparse.FileType("r"), help="The song file to insert chords into (not modified)")
+    insertchords_psr.add_argument("-n", "--chords-per-line", default=6, type=int, help="The number of chords to print per line")
     insertchords_psr.set_defaults(action=insert_chords)
 
-    makebuildinfo_psr = spsrs.add_parser("makebuildinfo")
+    makebuildinfo_psr = spsrs.add_parser("makebuildinfo", help=make_buildinfo.__doc__)
     makebuildinfo_psr.set_defaults(action=make_buildinfo)
     return psr
 
