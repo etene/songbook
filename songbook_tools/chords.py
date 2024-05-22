@@ -142,6 +142,7 @@ def generate_latex_chords(chords: list[Chord], chords_per_line: int = 5) -> str:
     for chord_batch in itertools.batched(chords, n=chords_per_line):
         lines.extend(i.latex_command for i in chord_batch)
         lines.append("\\newline")
-    # Remove last newline
-    lines.pop()
+    if lines:
+        # Remove last newline
+        lines.pop()
     return "\n".join(lines)
