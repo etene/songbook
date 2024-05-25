@@ -7,6 +7,7 @@ from enum import StrEnum, auto
 from typing import NamedTuple
 
 
+# TODO: handle non memorized chords (like \[^A])
 CHORD_RE = re.compile(r"\\\[([\w\d#]+)\]")
 
 
