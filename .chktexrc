@@ -1,0 +1,9 @@
+CmdLine {
+    -v
+    -n 10
+    -n 17
+    -n 16
+    -n 25
+    -n 9
+}
+TabSize = 4
