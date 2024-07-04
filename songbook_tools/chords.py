@@ -47,6 +47,8 @@ class NoteType(StrEnum):
     m = min = minor
     dom = dominant
     dim = diminished
+    suspended = auto()
+    sus = suspended
 
 
 CHORD_PATTERN: re.Pattern = re.compile(
@@ -98,6 +100,7 @@ class Chord(NamedTuple):
         """The latex command used to print the finger position pattern for this chord."""
         def replace_numbers(match: re.Match) -> str:
             return {
+                "4": "fourth",
                 "7": "seven",
                 "9": "nine",
                 "11": "eleven",
