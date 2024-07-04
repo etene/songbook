@@ -35,3 +35,6 @@ build/songbook.pdf: build/chords.tex build/songlist.tex build/buildinfo.tex $(BU
 
 clean:
 	rm -rf build
+
+lint:
+	chktex $(SONGS)
