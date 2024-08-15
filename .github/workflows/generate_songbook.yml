@@ -26,13 +26,16 @@ jobs:
       - name: Generate songbook
         run: |
           latex --version
-          make
+          make SONGBOOK=perso INSTRUMENT=ukulele
+          make SONGBOOK=smz-city-band INSTRUMENT=
       - name: Create static files for github pages
         run: |
           cp -rv site _site
-          cp -v build/songbook.pdf _site/
-          qrencode https://etene.github.io/songbook/songbook.pdf -o _site/qrcode.png
-
+          cp -v build/perso.pdf _site/songbook.pdf
+          cp -v build/smz-city-band.pdf _site/smz-city-band.pdf
+          qrencode -s6 https://etene.github.io/songbook/songbook.pdf -o _site/qrcode-perso.png
+          qrencode -s6 https://etene.github.io/songbook/smz-city-band.pdf -o _site/qrcode-smz.png
+          
       - name: Deploy pages artifact
         uses: actions/upload-pages-artifact@v2
 
