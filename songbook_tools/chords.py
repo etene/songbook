@@ -12,28 +12,34 @@ CHORD_RE = re.compile(r"\\\[([\w\d#]+)\]")
 
 
 class NoteName(StrEnum):
+    A_BEMOL = "Ab"
     A = "A"
     A_SHARP = "A#"
+    B_BEMOL = "Bb"
     B = "B"
     C = "C"
     C_SHARP = "C#"
+    D_BEMOL = "Db"
     D = "D"
     D_SHARP = "D#"
+    E_BEMOL = "Eb"
     E = "E"
     E_SHARP = "E#"
+    F_BEMOL = "Fb"
     F = "F"
     F_SHARP = "F#"
+    G_BEMOL = "Gb"
     G = "G"
     G_SHARP = "G#"
 
 
-note_aliases: dict[str, NoteName] = {
-    "Ab": NoteName.G_SHARP,
-    "Bb": NoteName.A_SHARP,
-    "Db": NoteName.C_SHARP,
-    "Eb": NoteName.D_SHARP,
-    "Fb": NoteName.E_SHARP,
-    "Gb": NoteName.F_SHARP,
+note_aliases: dict[NoteName, NoteName] = {
+    NoteName.G_SHARP: NoteName.A_BEMOL,
+    NoteName.A_SHARP: NoteName.B_BEMOL,
+    NoteName.C_SHARP: NoteName.D_BEMOL,
+    NoteName.D_SHARP: NoteName.E_BEMOL,
+    NoteName.E_SHARP: NoteName.F_BEMOL,
+    NoteName.F_SHARP: NoteName.G_BEMOL,
 }
 
 
@@ -52,7 +58,7 @@ class NoteType(StrEnum):
 
 
 CHORD_PATTERN: re.Pattern = re.compile(
-    r"(?P<root_note>[A-G]\#?)(?P<short_type>[a-z]*)(?P<add>\d*)"
+    r"(?P<root_note>[A-G][\#b]?)(?P<short_type>[a-z]*)(?P<add>\d*)"
 )
 
 
@@ -65,9 +71,8 @@ class Chord(NamedTuple):
     def parse(cls, shortname: str) -> 'Chord':
         """Parse from a short chord name like F or D7 or Am7."""
         if match := CHORD_PATTERN.match(shortname):
-            raw_note = match["root_note"]
             return cls(
-                root=NoteName(note_aliases.get(raw_note, raw_note)),
+                root=NoteName(match["root_note"]),
                 type=NoteType[raw_note_type] if (raw_note_type := match["short_type"]) else None,
                 add=int(raw_add) if (raw_add := match["add"]) else None
             )
@@ -122,12 +127,17 @@ def parse_chord_data(data: io.TextIOWrapper) -> dict[Chord, list[int]]:
     parsed_chords: dict[Chord, list[int]] = {}
     seen_notes: set[NoteName] = set()
     for raw_note in parser.sections():
-        note_name = NoteName(note_aliases.get(raw_note, raw_note))
+        note_name = NoteName(raw_note)
         if note_name in seen_notes:
             raise ValueError(f"Already seen a section for {note_name}")
         seen_notes.add(note_name)
         for chordname, finger_positions in parser[raw_note].items():
-            parsed_chords[Chord.parse(note_name + chordname)] = list(map(int, finger_positions))
+            chord = Chord.parse(note_name + chordname)
+            finger_pos = list(map(int, finger_positions))
+            parsed_chords[chord] = finger_pos
+            if (alias := note_aliases.get(chord.root)):
+                alt_chord = chord._replace(root=alias)
+                parsed_chords[alt_chord] = finger_positions
     return parsed_chords
 
 
