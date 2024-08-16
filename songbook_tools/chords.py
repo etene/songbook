@@ -8,7 +8,7 @@ from typing import NamedTuple
 
 
 # TODO: handle non memorized chords (like \[^A])
-CHORD_RE = re.compile(r"\\\[([\w\d#]+)\]")
+CHORD_RE = re.compile(r"\\\[([\w\d#&]+)\]")
 
 
 class NoteName(StrEnum):
@@ -58,7 +58,7 @@ class NoteType(StrEnum):
 
 
 CHORD_PATTERN: re.Pattern = re.compile(
-    r"(?P<root_note>[A-G][\#b]?)(?P<short_type>[a-z]*)(?P<add>\d*)"
+    r"(?P<root_note>[A-G][\#\&b]?)(?P<short_type>[a-z]*)(?P<add>\d*)"
 )
 
 
@@ -72,7 +72,7 @@ class Chord(NamedTuple):
         """Parse from a short chord name like F or D7 or Am7."""
         if match := CHORD_PATTERN.match(shortname):
             return cls(
-                root=NoteName(match["root_note"]),
+                root=NoteName(match["root_note"].replace("&", "b", 1)),
                 type=NoteType[raw_note_type] if (raw_note_type := match["short_type"]) else None,
                 add=int(raw_add) if (raw_add := match["add"]) else None
             )
@@ -94,7 +94,7 @@ class Chord(NamedTuple):
             "\\newcommand{"
             + self.latex_command
             + "}{\\gtab{"
-            + str(self).replace("#", r"\#")
+            + str(self).replace("#", r"\#", 1)
             + "}{"
             + ''.join(map(str, finger_positions))
             + "}}"
@@ -106,12 +106,13 @@ class Chord(NamedTuple):
         def replace_numbers(match: re.Match) -> str:
             return {
                 "4": "fourth",
+                "5": "fifth",
                 "7": "seven",
                 "9": "nine",
                 "11": "eleven",
                 "13": "thirteen",
             }[match.group(0)]
-        return "\\print" + re.sub(r"\d+", replace_numbers, str(self).replace("#", "sharp"))
+        return "\\print" + re.sub(r"\d+", replace_numbers, str(self).replace("#", "sharp", 1).replace("b", "bemol", 1))
 
 
 def parse_chord_data(data: io.TextIOWrapper) -> dict[Chord, list[int]]:
