@@ -43,5 +43,3 @@ build/$(SONGBOOK).pdf: build/$(SONGBOOK)/chords.tex build/$(SONGBOOK)/songlist.t
 clean:
 	rm -rf build/
 
-lint:
-	chktex $(SONGS)
