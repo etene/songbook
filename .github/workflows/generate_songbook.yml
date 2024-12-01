@@ -20,18 +20,25 @@ jobs:
         run: |
           sudo apt update
           sudo apt install --no-install-recommends make texlive-music texlive-lang-french texlive-latex-extra qrencode
-      - name: Generate songbook
+      - name: Generate songbooks
         run: |
           latex --version
           make SONGBOOK=perso INSTRUMENT=ukulele
+          make clean
           make SONGBOOK=smz-city-band INSTRUMENT=
+          make clean
+          make SONGBOOK=tepoe INSTRUMENT=tenor
+          make clean
       - name: Create static files for github pages
         run: |
           cp -rv site _site
           cp -v build/perso.pdf _site/songbook.pdf
           cp -v build/smz-city-band.pdf _site/smz-city-band.pdf
+          cp -v build/tepoe.pdf _site/tepoe.pdf
+
           qrencode -s6 https://etene.github.io/songbook/songbook.pdf -o _site/qrcode-perso.png
           qrencode -s6 https://etene.github.io/songbook/smz-city-band.pdf -o _site/qrcode-smz.png
+          qrencode -s6 https://etene.github.io/songbook/tepoe.pdf -o _site/qrcode-tepoe.png
           
       - name: Deploy pages artifact
         uses: actions/upload-pages-artifact@v2

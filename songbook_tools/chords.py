@@ -134,7 +134,7 @@ def parse_chord_data(data: io.TextIOWrapper) -> dict[Chord, list[int]]:
         seen_notes.add(note_name)
         for chordname, finger_positions in parser[raw_note].items():
             chord = Chord.parse(note_name + chordname)
-            finger_pos = list(map(int, finger_positions))
+            finger_pos = list(finger_positions)
             parsed_chords[chord] = finger_pos
             if (alias := note_aliases.get(chord.root)):
                 alt_chord = chord._replace(root=alias)

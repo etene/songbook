@@ -69,7 +69,7 @@ def get_parser() -> argparse.ArgumentParser:
 
     insertchords_psr = spsrs.add_parser("insertchords", help=insert_chords.__doc__)
     insertchords_psr.add_argument("song", type=argparse.FileType("r"), help="The song file to insert chords into (not modified)")
-    insertchords_psr.add_argument("-n", "--chords-per-line", default=6, type=int, help="The number of chords to print per line")
+    insertchords_psr.add_argument("-n", "--chords-per-line", default=8, type=int, help="The number of chords to print per line")
     insertchords_psr.set_defaults(action=insert_chords)
 
     makebuildinfo_psr = spsrs.add_parser("makebuildinfo", help=make_buildinfo.__doc__)
