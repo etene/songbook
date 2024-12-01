@@ -30,9 +30,11 @@ build/$(SONGBOOK)/$(SONGBOOK).tex: template.tex newline-fix.tex scripts/apply_ne
 	cp -v template.tex $@
 	scripts/apply_newline_fix.sh $@
 
-build/$(SONGBOOK)/chords.tex: songbook_tools/*.py chords/$(INSTRUMENT).ini
+build/$(SONGBOOK)/chords.tex: songbook_tools/*.py chords/*.ini
 	mkdir -vp build/$(SONGBOOK)
+ifneq ($(INSTRUMENT),)
 	python3.12 -m songbook_tools makechords chords/$(INSTRUMENT).ini > $@
+endif
 
 build/$(SONGBOOK).pdf: build/$(SONGBOOK)/chords.tex build/$(SONGBOOK)/songlist.tex build/$(SONGBOOK)/buildinfo.tex $(BUILT_SONGS) build/$(SONGBOOK)/$(SONGBOOK).tex
 	cd build/$(SONGBOOK) && pdflatex $(SONGBOOK).tex
