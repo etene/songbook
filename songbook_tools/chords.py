@@ -4,7 +4,7 @@ import re
 
 from configparser import ConfigParser
 from enum import StrEnum, auto
-from typing import NamedTuple
+from typing import Literal, NamedTuple
 
 
 # TODO: handle non memorized chords (like \[^A])
@@ -125,7 +125,7 @@ def parse_chord_data(data: io.TextIOWrapper) -> dict[Chord, list[int]]:
     parser = ConfigParser()
     parser.optionxform = str  # makes it case sensitive
     parser.read_file(data)
-    parsed_chords: dict[Chord, list[int]] = {}
+    parsed_chords: dict[Chord, str] = {}
     seen_notes: set[NoteName] = set()
     for raw_note in parser.sections():
         note_name = NoteName(raw_note)
@@ -134,8 +134,7 @@ def parse_chord_data(data: io.TextIOWrapper) -> dict[Chord, list[int]]:
         seen_notes.add(note_name)
         for chordname, finger_positions in parser[raw_note].items():
             chord = Chord.parse(note_name + chordname)
-            finger_pos = list(finger_positions)
-            parsed_chords[chord] = finger_pos
+            parsed_chords[chord] = finger_positions
             if (alias := note_aliases.get(chord.root)):
                 alt_chord = chord._replace(root=alias)
                 parsed_chords[alt_chord] = finger_positions

@@ -3,6 +3,7 @@ SONGS_BUILD_DIR=build/$(SONGBOOK)/songs
 SONGS=$(wildcard songbooks/$(SONGBOOK)/*.tex)
 BUILT_SONGS=$(patsubst songbooks/$(SONGBOOK)/%.tex,$(SONGS_BUILD_DIR)/%.tex,$(SONGS))
 INSTRUMENT=ukulele
+CHORDS_PER_LINE=8
 
 all: build/$(SONGBOOK).pdf
 
@@ -16,7 +17,7 @@ $(BUILT_SONGS): $(SONGS_BUILD_DIR)/%.tex: songbooks/$(SONGBOOK)/%.tex | $(SONGS_
 ifeq ("$(INSTRUMENT)","")
 	cp -v $< $@
 else
-	python3.12 -m songbook_tools insertchords $< > $@
+	python3.12 -m songbook_tools insertchords --chords-per-line $(CHORDS_PER_LINE) $< > $@
 endif
 
 build/$(SONGBOOK)/songlist.tex: $(BUILT_SONGS) songbook_tools/*.py
