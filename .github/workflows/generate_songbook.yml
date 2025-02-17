@@ -38,7 +38,8 @@ jobs:
           qrencode -s6 https://etene.github.io/songbook/tepoe.pdf -o _site/qrcode-tepoe.png
           
       - name: Deploy pages artifact
-        uses: actions/upload-artifact@v4
+        id: deployment
+        uses: actions/upload-pages-artifact@v3
 
   # Deploy job
   deploy:
@@ -60,6 +61,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: _site/
+        uses: actions/deploy-pages@v4
