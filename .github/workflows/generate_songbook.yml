@@ -25,7 +25,7 @@ jobs:
           latex --version
           make SONGBOOK=perso INSTRUMENT=ukulele
           make SONGBOOK=smz-city-band INSTRUMENT=
-          make SONGBOOK=tepoe INSTRUMENT=tenor
+          make SONGBOOK=tepoe INSTRUMENT=guitar CHORDS_PER_LINE=5
       - name: Create static files for github pages
         run: |
           cp -rv site _site
