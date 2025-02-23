@@ -17,15 +17,15 @@ $(BUILT_SONGS): $(SONGS_BUILD_DIR)/%.tex: songbooks/$(SONGBOOK)/%.tex | $(SONGS_
 ifeq ("$(INSTRUMENT)","")
 	cp -v $< $@
 else
-	python3.12 -m songbook_tools insertchords --chords-per-line $(CHORDS_PER_LINE) $< > $@
+	python3.13 -m songbook_tools insertchords --chords-per-line $(CHORDS_PER_LINE) $< > $@
 endif
 
 build/$(SONGBOOK)/songlist.tex: $(BUILT_SONGS) songbook_tools/*.py
-	cd build/$(SONGBOOK) && PYTHONPATH=../.. python3.12 -m songbook_tools makesonglist songs > ../../$@
+	cd build/$(SONGBOOK) && PYTHONPATH=../.. python3.13 -m songbook_tools makesonglist songs > ../../$@
 
 build/$(SONGBOOK)/buildinfo.tex: songbook_tools/*.py
 	mkdir -vp build/$(SONGBOOK)
-	python3.12 -m songbook_tools makebuildinfo > $@
+	python3.13 -m songbook_tools makebuildinfo > $@
 
 build/$(SONGBOOK)/$(SONGBOOK).tex: template.tex newline-fix.tex scripts/apply_newline_fix.sh
 	cp -v template.tex $@
@@ -34,7 +34,7 @@ build/$(SONGBOOK)/$(SONGBOOK).tex: template.tex newline-fix.tex scripts/apply_ne
 build/$(SONGBOOK)/chords.tex: songbook_tools/*.py chords/*.ini
 	mkdir -vp build/$(SONGBOOK)
 ifneq ($(INSTRUMENT),)
-	python3.12 -m songbook_tools makechords chords/$(INSTRUMENT).ini > $@
+	python3.13 -m songbook_tools makechords chords/$(INSTRUMENT).ini > $@
 endif
 
 build/$(SONGBOOK).pdf: build/$(SONGBOOK)/chords.tex build/$(SONGBOOK)/songlist.tex build/$(SONGBOOK)/buildinfo.tex $(BUILT_SONGS) build/$(SONGBOOK)/$(SONGBOOK).tex
