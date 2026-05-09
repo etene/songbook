@@ -4,7 +4,7 @@ import re
 
 from configparser import ConfigParser
 from enum import StrEnum, auto
-from typing import Literal, NamedTuple
+from typing import NamedTuple
 
 
 # TODO: handle non memorized chords (like \[^A])
@@ -88,7 +88,7 @@ class Chord(NamedTuple):
         add = str(self.add) if self.add else ""
         return f"{self.root}{type_}{add}"
 
-    def to_latex(self, finger_positions: list[int]) -> str:
+    def to_latex(self, finger_positions: str) -> str:
         """The definition of the latex command used to print the finger position pattern for this chord."""
         return (
             "\\newcommand{"
@@ -96,7 +96,7 @@ class Chord(NamedTuple):
             + "}{\\gtab{"
             + str(self).replace("#", r"\#", 1)
             + "}{"
-            + ''.join(map(str, finger_positions))
+            + finger_positions
             + "}}"
         )
 
@@ -115,7 +115,7 @@ class Chord(NamedTuple):
         return "\\print" + re.sub(r"\d+", replace_numbers, str(self).replace("#", "sharp", 1).replace("b", "bemol", 1))
 
 
-def parse_chord_data(data: io.TextIOWrapper) -> dict[Chord, list[int]]:
+def parse_chord_data(data: io.TextIOWrapper) -> dict[Chord, str]:
     """Parse fingers positions for chords from a .ini file.
 
     Return a mapping of chords to finger positions.

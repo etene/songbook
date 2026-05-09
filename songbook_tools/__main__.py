@@ -21,9 +21,9 @@ def insert_after_pattern(song: str, text: str, pattern: re.Pattern) -> str:
 def make_song_list(songdir: Path):
     """Print a Latex `\\input` command for each song in the given `songdir`."""
     assert songdir.is_dir()
-    for i in sorted(songdir.iterdir(), key=attrgetter("name")):
-        if i.suffix == ".tex":
-            print(f"\\input{{{i}}}")
+    tex_files = filter(lambda f: f.suffix == ".tex", songdir.iterdir())
+    for i in sorted(tex_files, key=attrgetter("name")):
+        print(f"\\input{{{i}}}")
 
 
 def make_chords(instrument_file: TextIOWrapper):
@@ -42,12 +42,11 @@ def make_buildinfo():
 def insert_chords(song: TextIOWrapper, chords_per_line: int):
     """Detect chords in a song and insert commands to print their finger positions under the title."""
     song_tex = song.read()
-    found_chords = chords.find_chords(song_tex)
     print(
         insert_after_pattern(
             song_tex,
             text=chords.generate_latex_chords(
-                chords=found_chords,
+                chords=chords.find_chords(song_tex),
                 chords_per_line=chords_per_line,
             ),
             pattern=re.compile(r"\\beginsong.*+\n", re.M),
